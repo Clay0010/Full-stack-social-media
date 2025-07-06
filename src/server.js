@@ -2,6 +2,8 @@ import express from "express";
 import cookieParser from "cookie-parser";
 import authRoutes from "./routes/auth.routes.js";
 import userRoutes from "./routes/user.routes.js";
+import postRoutes from "./routes/post.routes.js";
+import commentRoutes from "./routes/comment.routes.js";
 import cors from "cors";
 
 const app = express();
@@ -18,6 +20,8 @@ app.use(
 
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
+app.use("/api/posts", postRoutes)
+app.use("/api/comments", commentRoutes);
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
