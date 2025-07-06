@@ -43,14 +43,15 @@ export const register = async (req, res) => {
     const newUser = await prisma.user.create({
       data: {
         email,
-        hashedPassword,
+        password: hashedPassword,
         username,
         profilePicUrl: randomAvatar,
+        bio: "",
       },
     });
 
     return res
-      .json(201)
+      .status(201)
       .json({ user: newUser, message: "User created successfully" });
   } catch (error) {
     console.error("Error creating user:", error);
@@ -66,7 +67,7 @@ export const login = async (req, res) => {
       return res.status(400).json({ error: "Email and password are required" });
     }
 
-    const user = await prisma.user.findUnique({ wherer: { email } });
+    const user = await prisma.user.findUnique({ where: { email } });
 
     if (!user) {
       return res.status(401).json({ error: "Invalid email or password" });
@@ -109,4 +110,28 @@ export const logout = async (req, res) => {
   });
 
   res.status(200).json({ success: true, message: "Logged out successfully" });
+};
+
+export const getCurrentUser = async (req, res) => {
+  try {
+    const user = await prisma.user.findUnique({
+      where: { id: req.user.userId },
+      select: {
+        id: true,
+        email: true,
+        username: true,
+        profilePicUrl: true,
+        bio: true,
+      },
+    });
+
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    res.status(200).json({ success: true, user });
+  } catch (err) {
+    console.error("Error in /me:", err);
+    res.status(500).json({ error: "Something went wrong" });
+  }
 };
