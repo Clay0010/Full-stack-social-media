@@ -2,6 +2,8 @@ import useAuthUser from "../hooks/useAuthUser";
 import { useQuery } from "@tanstack/react-query";
 import { getUserProfile } from "../lib/api";
 import LetterGlitch from "../components/LetterGlitch";
+import TiltedCard from "../components/TiltedCard";
+import formatToLocalTime from "../lib/formatToLocalTime";
 
 const ProfilePage = () => {
   const authUser = useAuthUser();
@@ -33,7 +35,7 @@ const ProfilePage = () => {
             smooth={true}
           /> */}
 
-      <div className="mx-40 my-10 flex justify-around items-center shadow-lg rounded-4xl relative overflow-hidden">
+      <div className="mx-40 mt-20 flex justify-around items-center shadow-lg rounded-4xl relative overflow-hidden">
         {/* leftSide - profile image */}
         <div className="absolute inset-0 z-0 opacity-15 pointer-events-none">
           <LetterGlitch
@@ -113,20 +115,35 @@ const ProfilePage = () => {
             <div className="grid grid-cols-3 gap-10">
               {user.user.posts.map((post) => {
                 return (
-                  <div
-                    className="border border-neutral  w-[26vw] h-[40vh] rounded-lg shadow-xl overflow-hidden "
-                    key={post.id}
-                  >
-                    {post.images.length > 0 ? (
-                      <img
-                        src={post.images[0]?.url}
-                        className="w-full h-full object-cover rounded-lg "
-                      />
-                    ) : (
-                      //   <h1>{post.images[0].url}</h1>
-                      <p>post has no images</p>
-                    )}
-                  </div>
+                  // <div
+                  //   className="border border-neutral  w-[26vw] h-[40vh] rounded-lg shadow-xl overflow-hidden "
+                  //   key={post.id}
+                  // >
+                  //   {post.images.length > 0 ? (
+                  //     <img
+                  //       src={post.images[0]?.url}
+                  //       className="w-full h-full object-cover rounded-lg "
+                  //     />
+                  //   ) : (
+                  //     //   <h1>{post.images[0].url}</h1>
+                  //     <p>post has no images</p>
+                  //   )}
+                  // </div>
+                  <TiltedCard
+                    imageSrc={post.images[0]?.url}
+                    altText="Post"
+                    captionText="Show Details"
+                    containerHeight="300px"
+                    containerWidth="300px"
+                    imageHeight="300px"
+                    imageWidth="300px"
+                    rotateAmplitude={12}
+                    scaleOnHover={1.2}
+                    showMobileWarning={false}
+                    showTooltip={true}
+                    displayOverlayContent={true}
+                    overlayContent={formatToLocalTime(post.createdAt)}
+                  />
                 );
               })}
             </div>
