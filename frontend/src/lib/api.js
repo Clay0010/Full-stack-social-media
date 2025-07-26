@@ -69,3 +69,18 @@ export const updateComment = async (commentId, postId, content) => {
   );
   return res.data;
 };
+
+export const followUser = async (userId) => {
+  const res = await axiosInstance.post(`users/${userId}/follow`);
+  return res.data;
+};
+
+export const unfollowUser = async (userId) => {
+  const res = await axiosInstance.post(`users/${userId}/unfollow`);
+  return res.data;
+};
+
+export const updateProfile = async (profileData) => {
+  const res = await axiosInstance.patch("/users/me", profileData);
+  return res.data;
+};

@@ -9,12 +9,14 @@ import toast from "react-hot-toast";
 import { AnimatePresence, motion } from "motion/react";
 import useDeleteComment from "../hooks/useDeleteComment";
 import useUpdateComment from "../hooks/useUpdateComment";
+import { useNavigate } from "react-router-dom";
 
 const PostCard = ({ post }) => {
   const [showComment, setShowComment] = useState(false);
   const [comment, setComment] = useState("");
   const [editingComment, setEditingComment] = useState(null);
   const [editingText, setEditingText] = useState("");
+  const navigate = useNavigate();
 
   const formattedDate = formatToLocalTime(post.createdAt);
 
@@ -61,7 +63,6 @@ const PostCard = ({ post }) => {
   const handleEditClick = (comment) => {
     setEditingComment(comment);
     setEditingText(comment.content);
-    document.getElementById("edit_comment_modal").showModal();
   };
 
   const handleUpdateComment = () => {
@@ -73,11 +74,19 @@ const PostCard = ({ post }) => {
           toast.success("Comment updated successfully!");
           setEditingComment(null);
           setEditingText("");
-          document.getElementById("edit_comment_modal").close();
         },
         onError: () => toast.error("Failed to update comment"),
       }
     );
+  };
+
+  const handleCloseEditModal = () => {
+    setEditingComment(null);
+    setEditingText("");
+  };
+
+  const handleShowProfile = (userId) => {
+    navigate(`/profile/${userId}`);
   };
 
   return (
@@ -87,10 +96,18 @@ const PostCard = ({ post }) => {
         <img
           src={post.user.profilePicUrl}
           alt="user"
-          className="w-10 h-10 object-cover rounded-full"
+          className="w-10 h-10 object-cover rounded-full hover:cursor-pointer"
+          title="View Profile"
+          onClick={() => handleShowProfile(post.user.id)}
         />
         <span>
-          <h1 className="text-sm font-bold">{post.user.username}</h1>
+          <h1
+            className="text-sm font-bold hover:cursor-pointer hover:text-primary"
+            title="View Profile"
+            onClick={() => handleShowProfile(post.user.id)}
+          >
+            {post.user.username}
+          </h1>
           <p className="text-xs font-light">{formattedDate}</p>
         </span>
       </section>
@@ -173,10 +190,14 @@ const PostCard = ({ post }) => {
                     <img
                       src={comment.user.profilePicUrl}
                       alt="user"
-                      className="w-8 h-8 object-cover rounded-full flex-shrink-0"
+                      className="w-8 h-8 object-cover rounded-full flex-shrink-0 hover:cursor-pointer"
+                      onClick={() => handleShowProfile(comment.user.id)}
                     />
                     <div className="max-w-[80%] break-words">
-                      <h1 className="text-xs font-bold">
+                      <h1
+                        className="text-xs font-bold hover:cursor-pointer hover:text-primary"
+                        onClick={() => handleShowProfile(comment.user.id)}
+                      >
                         {comment.user.username}
                       </h1>
                       <p className="text-sm">{comment.content}</p>
@@ -234,36 +255,30 @@ const PostCard = ({ post }) => {
         )}
       </AnimatePresence>
 
-      {/* EDIT COMMENT MODAL */}
-      <dialog id="edit_comment_modal" className="modal">
-        <div className="modal-box">
-          <h1 className="text-lg font-bold mb-3">Edit Comment</h1>
-          <textarea
-            className="textarea textarea-bordered w-full mb-3"
-            value={editingText}
-            onChange={(e) => setEditingText(e.target.value)}
-          />
-          <div className="flex justify-end gap-3">
-            <button className="btn btn-primary" onClick={handleUpdateComment}>
-              Save
-            </button>
-            <form method="dialog">
-              <button
-                className="btn btn-ghost"
-                onClick={() => {
-                  setEditingComment(null);
-                  setEditingText("");
-                }}
-              >
+      {/* EDIT COMMENT MODAL (State-driven) */}
+      {editingComment && (
+        <dialog open className="modal">
+          <div className="modal-box">
+            <h1 className="text-lg font-bold mb-3">Edit Comment</h1>
+            <textarea
+              className="textarea textarea-bordered w-full mb-3"
+              value={editingText}
+              onChange={(e) => setEditingText(e.target.value)}
+            />
+            <div className="flex justify-end gap-3">
+              <button className="btn btn-primary" onClick={handleUpdateComment}>
+                Save
+              </button>
+              <button className="btn btn-ghost" onClick={handleCloseEditModal}>
                 Cancel
               </button>
-            </form>
+            </div>
           </div>
-        </div>
-        <form method="dialog" className="modal-backdrop">
-          <button>close</button>
-        </form>
-      </dialog>
+          <form method="dialog" className="modal-backdrop">
+            <button onClick={handleCloseEditModal}>close</button>
+          </form>
+        </dialog>
+      )}
     </div>
   );
 };

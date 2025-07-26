@@ -24,6 +24,7 @@ export const getUser = async (req, res) => {
   const userId = parseInt(req.params.id, 10);
 
   try {
+    // 1. Fetch the user info and posts only
     const user = await prisma.user.findUnique({
       where: { id: userId },
       select: {
@@ -33,30 +34,6 @@ export const getUser = async (req, res) => {
         email: true,
         bio: true,
         createdAt: true,
-        followers: {
-          select: {
-            follower: {
-              select: {
-                id: true,
-                username: true,
-                profilePicUrl: true,
-              },
-            },
-          },
-        },
-
-        following: {
-          select: {
-            following: {
-              select: {
-                id: true,
-                username: true,
-                profilePicUrl: true,
-              },
-            },
-          },
-        },
-
         posts: {
           select: {
             id: true,
@@ -72,6 +49,35 @@ export const getUser = async (req, res) => {
       return res.status(404).json({ error: "User not found" });
     }
 
+    // 2. Fetch followers (users who follow this user)
+    const followers = await prisma.userRelation.findMany({
+      where: { followingId: userId },
+      select: {
+        follower: {
+          select: {
+            id: true,
+            username: true,
+            profilePicUrl: true,
+          },
+        },
+      },
+    });
+
+    // 3. Fetch following (users this user follows)
+    const following = await prisma.userRelation.findMany({
+      where: { followerId: userId },
+      select: {
+        following: {
+          select: {
+            id: true,
+            username: true,
+            profilePicUrl: true,
+          },
+        },
+      },
+    });
+
+    // 4. Format the user object with followers and following arrays
     const formattedUser = {
       id: user.id,
       username: user.username,
@@ -79,11 +85,9 @@ export const getUser = async (req, res) => {
       email: user.email,
       profilePicUrl: user.profilePicUrl,
       createdAt: user.createdAt,
-
       posts: user.posts,
-
-      followers: user.followers.map((f) => f.follower),
-      following: user.following.map((f) => f.following),
+      followers: followers.map((f) => f.follower),
+      following: following.map((f) => f.following),
     };
 
     res.status(200).json({ success: true, user: formattedUser });

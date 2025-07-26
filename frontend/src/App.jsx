@@ -56,6 +56,14 @@ const App = () => {
             )
           }
         />
+        <Route
+          path="/profile/:userId"
+          element={
+            <Layout>
+              <ProfilePage />
+            </Layout>
+          }
+        />
       </Routes>
       <Toaster />
     </div>
