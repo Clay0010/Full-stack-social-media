@@ -11,6 +11,7 @@ import { useThemeStore } from "./store/useThemeStore";
 import { axiosInstance } from "./lib/axios";
 import axios from "axios";
 import ProfilePage from "./pages/ProfilePage";
+import PostDetailsPage from "./pages/PostDetailsPage";
 
 const App = () => {
   const { isLoading, authUser } = useAuthUser();
@@ -63,6 +64,14 @@ const App = () => {
               <ProfilePage />
             </Layout>
           }
+        />
+        <Route 
+        path="/post/:postId"
+        element={
+          <Layout>
+            <PostDetailsPage />
+          </Layout>
+        }
         />
       </Routes>
       <Toaster />

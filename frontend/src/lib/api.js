@@ -84,3 +84,8 @@ export const updateProfile = async (profileData) => {
   const res = await axiosInstance.patch("/users/me", profileData);
   return res.data;
 };
+
+export const fetchPostDetails = async (postId) => {
+  const res = await axiosInstance.get(`/posts/${postId}`);
+  return res.data;
+};

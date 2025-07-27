@@ -278,15 +278,27 @@ export const getSinglePost = async (req, res) => {
           select: {
             id: true,
             username: true,
+            email: true,
             profilePicUrl: true,
           },
         },
+        images: true,
         comments: {
           select: {
             id: true,
             content: true,
             createdAt: true,
             userId: true,
+            user: {
+              select: {
+                id: true,
+                username: true,
+                profilePicUrl: true,
+              },
+            },
+          },
+          orderBy: {
+            createdAt: "desc",
           },
         },
         likes: {

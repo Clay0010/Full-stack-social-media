@@ -10,6 +10,7 @@ import toast from "react-hot-toast";
 import useUnfollowUser from "../hooks/useUnfollowUser";
 import { useEffect, useState } from "react";
 import useUpdateProfile from "../hooks/useUpdateProfile";
+import { useNavigate } from "react-router-dom";
 
 const ProfilePage = () => {
   const [userData, setUserData] = useState({
@@ -22,6 +23,7 @@ const ProfilePage = () => {
     following: [],
     posts: [],
   });
+  const navigate = useNavigate();
 
   const { updateProfileMutation } = useUpdateProfile();
 
@@ -101,6 +103,12 @@ const ProfilePage = () => {
 
     toast.success("Profile updated successfully!");
     setEditing(false);
+  };
+
+  const handleOpenPostDetails = (postId) => {
+    console.log(`Opening post details for post ID: ${postId}`);
+
+    navigate(`/post/${postId}`);
   };
 
   return (
@@ -200,22 +208,27 @@ const ProfilePage = () => {
           {userData.posts.length > 0 ? (
             <div className="grid grid-cols-3 gap-10">
               {userData.posts.map((post) => (
-                <TiltedCard
+                <div
                   key={post.id}
-                  imageSrc={post.images[0]?.url}
-                  altText="Post"
-                  captionText="Show Details"
-                  containerHeight="300px"
-                  containerWidth="300px"
-                  imageHeight="300px"
-                  imageWidth="300px"
-                  rotateAmplitude={12}
-                  scaleOnHover={1.2}
-                  showMobileWarning={false}
-                  showTooltip={true}
-                  displayOverlayContent={true}
-                  overlayContent={formatToLocalTime(post.createdAt)}
-                />
+                  className="w-full h-full"
+                  onClick={() => handleOpenPostDetails(post.id)}
+                >
+                  <TiltedCard
+                    imageSrc={post.images[0]?.url}
+                    altText="Post"
+                    captionText="Show Details"
+                    containerHeight="300px"
+                    containerWidth="300px"
+                    imageHeight="300px"
+                    imageWidth="300px"
+                    rotateAmplitude={12}
+                    scaleOnHover={1.2}
+                    showMobileWarning={false}
+                    showTooltip={true}
+                    displayOverlayContent={true}
+                    overlayContent={formatToLocalTime(post.createdAt)}
+                  />
+                </div>
               ))}
             </div>
           ) : (

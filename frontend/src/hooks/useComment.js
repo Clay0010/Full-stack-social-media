@@ -13,6 +13,7 @@ const useComment = () => {
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ["posts"] });
       queryClient.invalidateQueries({ queryKey: ["followingPosts"] });
+      queryClient.invalidateQueries({ queryKey: ["postDetails"] });
 
       // Optionally invalidate specific post:
       // queryClient.invalidateQueries({ queryKey: ["post", variables.postId] });
