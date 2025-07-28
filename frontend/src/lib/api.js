@@ -89,3 +89,8 @@ export const fetchPostDetails = async (postId) => {
   const res = await axiosInstance.get(`/posts/${postId}`);
   return res.data;
 };
+
+export const getAllUsers = async ()=> {
+  const res = await axiosInstance.get("/users");
+  return res.data;
+}

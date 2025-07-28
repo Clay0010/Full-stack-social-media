@@ -130,26 +130,35 @@ const PostCard = ({ post }) => {
       </section>
 
       {/* likes & comments */}
-      <section className="flex items-center space-x-6 mt-1 px-4">
+      <section className="flex items-center justify-between space-x-6 mt-1 px-4 pr-10">
         <div className="flex items-center space-x-2">
-          <button onClick={likePost} className="hover:cursor-pointer">
-            {alreadyLiked ? (
-              <Heart className="text-red-500" fill="red" />
-            ) : (
-              <Heart />
-            )}
-          </button>
-          <span>{post.likes.length}</span>
+          <div className="flex items-center space-x-2">
+            <button onClick={likePost} className="hover:cursor-pointer">
+              {alreadyLiked ? (
+                <Heart className="text-red-500" fill="red" />
+              ) : (
+                <Heart />
+              )}
+            </button>
+            <span>{post.likes.length}</span>
+          </div>
+          <div className="flex items-center space-x-2">
+            <button
+              onClick={() => setShowComment(!showComment)}
+              className="hover:cursor-pointer"
+            >
+              <MessageCircleMore />
+            </button>
+            <span>{post.comments.length}</span>
+          </div>
         </div>
-        <div className="flex items-center space-x-2">
-          <button
-            onClick={() => setShowComment(!showComment)}
-            className="hover:cursor-pointer"
-          >
-            <MessageCircleMore />
-          </button>
-          <span>{post.comments.length}</span>
-        </div>
+
+        <button
+          className="btn btn-primary btn-sm "
+          onClick={() => navigate(`/post/${post.id}`)}
+        >
+          Show Details
+        </button>
       </section>
 
       {/* comments */}

@@ -1,14 +1,21 @@
 import { useQuery } from "@tanstack/react-query";
-import { getUser } from "../lib/api";
+import { getUserProfile } from "../lib/api";
 
-const useGetUser = ({ userId }) => {
-  const user = useQuery({
-    queryKey: ["GetUser"],
-    queryFn: () => getUser(userId),
+const useGetUser = (userId) => {
+  const {
+    data: userData,
+    isLoading,
+    isError,
+    error,
+  } = useQuery({
+    queryKey: ["userProfile", userId],
+    queryFn: () => getUserProfile(userId),
+    enabled: !!userId,
+    refetchOnWindowFocus: false,
     retry: false,
   });
 
-  return user;
+  return { userData, isLoading, isError, error };
 };
 
 export default useGetUser;
