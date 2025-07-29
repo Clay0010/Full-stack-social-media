@@ -90,7 +90,12 @@ export const fetchPostDetails = async (postId) => {
   return res.data;
 };
 
-export const getAllUsers = async ()=> {
+export const getAllUsers = async () => {
   const res = await axiosInstance.get("/users");
   return res.data;
-}
+};
+
+export const getSuggestions = async () => {
+  const res = await axiosInstance.get("/users/suggestions");
+  return res.data;
+};

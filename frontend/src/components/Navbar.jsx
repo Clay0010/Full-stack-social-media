@@ -27,7 +27,6 @@ const Navbar = () => {
     );
 
     setSearchResults(results);
-    console.log(results);
   };
 
   if (isLoading) return <div>Loading...</div>;

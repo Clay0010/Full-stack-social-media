@@ -20,7 +20,7 @@ const ProfilePage = () => {
   const finalUserId = routeUserId || authUser.authUser.userId;
 
   const { userData, isLoading, error } = useGetUser(finalUserId);
-  const { followUserMutation } = useFollowUser(finalUserId);
+  const { followUserMutation } = useFollowUser();
   const { unfollowUserMutation } = useUnfollowUser(finalUserId);
   const { updateProfileMutation } = useUpdateProfile();
 

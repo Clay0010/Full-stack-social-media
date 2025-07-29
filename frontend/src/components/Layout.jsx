@@ -19,7 +19,7 @@ const Layout = ({ showSidebar = false, showSuggestions = false, children }) => {
 
         <main className="flex-1 overflow-y-auto ">{children}</main>
         {showSuggestions && (
-          <div className="w-75 shadow-2xl bg-base-100 h-[91vh] sticky top-16 rounded-t-lg ml-5">
+          <div className="w-75 shadow-2xl bg-base-100 h-[91vh] sticky top-16 rounded-t-lg ml-5 overflow-y-auto hide-scrollbar">
             <Suggestions />
           </div>
         )}

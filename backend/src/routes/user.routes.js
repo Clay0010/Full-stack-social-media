@@ -8,6 +8,7 @@ import {
   updateUser,
   getUserFollowers,
   getUserFollowing,
+  getSuggestion,
 } from "../controllers/user.controller.js";
 import { authenticate } from "../middleware/auth.middleware.js";
 
@@ -16,6 +17,8 @@ const router = express.Router();
 router.get("", authenticate, getAllUsers);
 router.get("/me", authenticate, getMe);
 router.patch("/me", authenticate, updateUser);
+router.get("/suggestions", authenticate, getSuggestion);
+
 router.get("/:id", authenticate, getUser);
 router.get("/:id/followers", authenticate, getUserFollowers);
 router.get("/:id/following", authenticate, getUserFollowing);

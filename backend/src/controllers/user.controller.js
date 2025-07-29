@@ -1,4 +1,5 @@
 import prisma from "../prismaClient.js";
+import _ from "lodash";
 
 // get all users
 export const getAllUsers = async (req, res) => {
@@ -336,6 +337,53 @@ export const unfollowUser = async (req, res) => {
     }
   } catch (error) {
     console.log("Error unfollowing user:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+};
+
+export const getSuggestion = async (req, res) => {
+  const userId = req.user.userId;
+  if (!userId) {
+    return res.status(400).json({ error: "User ID is required" });
+  }
+
+  try {
+    const user = await prisma.user.findUnique({
+      where: {
+        id: userId,
+      },
+    });
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const relations = await prisma.userRelation.findMany({
+      where: { followerId: userId },
+      select: { followingId: true },
+    });
+
+    const followingIds = relations.map((r) => r.followingId);
+
+    const users = await prisma.user.findMany({
+      where: {
+        id: {
+          notIn: [...followingIds, userId],
+        },
+      },
+      select: {
+        id: true,
+        username: true,
+        profilePicUrl: true,
+      },
+    });
+
+    const shuffled = _.shuffle(users);
+    const suggestions = shuffled.slice(0, 10);
+
+    res.status(200).json({ success: true, suggestions });
+  } catch (error) {
+    console.log("Error fetching user suggestions:", error);
     res.status(500).json({ error: "Internal server error" });
   }
 };
