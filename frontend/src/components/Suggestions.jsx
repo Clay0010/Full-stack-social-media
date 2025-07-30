@@ -2,8 +2,10 @@ import React from "react";
 import usegetSuggestions from "../hooks/usegetSuggestions";
 import useFollowUser from "../hooks/useFollowUser";
 import toast from "react-hot-toast";
+import { useNavigate } from "react-router-dom";
 
 const Suggestions = () => {
+  const navigate = useNavigate();
   const {
     followUserMutation,
     error: followUserError,
@@ -48,9 +50,15 @@ const Suggestions = () => {
                 <img
                   src={user.profilePicUrl || "https://via.placeholder.com/150"}
                   alt="image"
-                  className="h-8 w-8 rounded-full "
+                  className="h-8 w-8 rounded-full hover:cursor-pointer"
+                  onClick={() => navigate(`/profile/${user.id}`)}
                 />
-                <h3 className="text-sm font-semibold">{user.username}</h3>
+                <h3
+                  className="text-sm font-semibold hover:cursor-pointer hover:underline"
+                  onClick={() => navigate(`/profile/${user.id}`)}
+                >
+                  {user.username}
+                </h3>
               </span>
               <button
                 className="btn btn-primary text-sm btn-sm"

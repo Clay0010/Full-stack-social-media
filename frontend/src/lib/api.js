@@ -99,3 +99,16 @@ export const getSuggestions = async () => {
   const res = await axiosInstance.get("/users/suggestions");
   return res.data;
 };
+
+export const updatePost = async (postId, content) => {
+  const res = await axiosInstance.patch(`/posts/${postId}`, {
+    content,
+  });
+
+  return res.data;
+};
+
+export const deletePost = async (postId) => {
+  const res = await axiosInstance.delete(`/posts/${postId}`);
+  return res.data;
+};

@@ -3,15 +3,26 @@ import { useParams } from "react-router-dom";
 import useGetPostDetails from "../hooks/useGetPostDetails";
 import useComment from "../hooks/useComment";
 import toast from "react-hot-toast";
+import useAuthUser from "../hooks/useAuthUser";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { axiosInstance } from "../lib/axios";
+import useUpdatePost from "../hooks/useUpdatePost";
+import useDeletePost from "../hooks/useDeletePost";
 
 const PostDetailsPage = () => {
   const { postId } = useParams();
   const [comment, setComment] = useState("");
+  const [isEditing, setIsEditing] = useState(false);
+  const [editedContent, setEditedContent] = useState("");
 
+  const authUser = useAuthUser();
+  const userId = authUser.authUser.userId;
   const { postDetails, error, isLoading } = useGetPostDetails(postId);
-
-  // Always call hooks unconditionally
   const { createCommentMutation } = useComment(postId);
+
+  const { updatePostMutation } = useUpdatePost();
+
+  const { deletePostMutation } = useDeletePost();
 
   if (isLoading) return <h1>Loading post details...</h1>;
   if (error) return <h1>Error loading post details: {error.message}</h1>;
@@ -32,29 +43,124 @@ const PostDetailsPage = () => {
     );
   };
 
+  const handleEditClick = () => {
+    setEditedContent(postDetails.post.content);
+    setIsEditing(true);
+  };
+
+  const handleCancelEdit = () => {
+    setIsEditing(false);
+  };
+
+  const handleSaveEdit = () => {
+    if (!editedContent.trim()) {
+      toast.error("Content cannot be empty");
+      return;
+    }
+    // updatePostMutation.mutate(editedContent);
+    updatePostMutation(
+      {
+        content: editedContent,
+        postId: postDetails.post.id,
+      },
+      {
+        onSuccess: () => {
+          setIsEditing(false);
+          toast.success("Post updated successfully");
+        },
+        onError: () => toast.error("Failed to update post"),
+      }
+    );
+  };
+
+  const handleDeletePost = (postId) => {
+    console.log(postId);
+
+    deletePostMutation(
+      { postId },
+      {
+        onSuccess: () => {
+          toast.success("Post deleted successfully");
+
+          setTimeout(() => {
+            window.location.href = "/profile";
+          }, 500);
+        },
+        onError: () => toast.error("Failed to delete post"),
+      }
+    );
+  };
+
   return (
-    <div className="w-full mx-auto bg-base-200 p-30">
+    <div className="w-[80%] mx-auto shadow-lg p-30">
       <div>
         {/* user information */}
-        <span className="flex items-center gap-2 mb-5">
-          <img
-            src={postDetails.post.user.profilePicUrl}
-            alt="user's image"
-            className="size-10 rounded-full"
-          />
-          <span>
-            <h1 className="text-sm font-bold">
-              {postDetails.post.user.username}
-            </h1>
-            <p className="text-xs text-gray-500">
-              {postDetails.post.user.email}
-            </p>
-          </span>
+        <span className="flex items-center justify-between gap-2 mb-5">
+          <div className="flex items-center gap-3">
+            <img
+              src={postDetails.post.user.profilePicUrl}
+              alt="user's image"
+              className="size-11 rounded-full"
+            />
+            <span>
+              <h1 className="text- font-bold">
+                {postDetails.post.user.username}
+              </h1>
+              <p className="text-xs text-gray-500">
+                {postDetails.post.user.email}
+              </p>
+            </span>
+          </div>
+          <div>
+            {postDetails.post.userId === userId && !isEditing && (
+              <button className="btn btn-secondary" onClick={handleEditClick}>
+                Edit Post
+              </button>
+            )}
+
+            {postDetails.post.userId === userId && (
+              <button
+                className="btn btn-error ml-2"
+                onClick={() => {
+                  handleDeletePost(postDetails.post.id);
+                }}
+              >
+                Delete Post
+              </button>
+            )}
+          </div>
         </span>
 
         {/* post content */}
         <div>
-          <p className="text-lg text-white">{postDetails.post.content}</p>
+          {isEditing ? (
+            <div>
+              <textarea
+                className="textarea textarea-bordered w-full mb-3"
+                rows={4}
+                value={editedContent}
+                onChange={(e) => setEditedContent(e.target.value)}
+              />
+              <div className="flex gap-2">
+                <button
+                  className="btn btn-primary"
+                  onClick={handleSaveEdit}
+                  disabled={updatePostMutation.isLoading}
+                >
+                  {updatePostMutation.isLoading ? "Saving..." : "Save"}
+                </button>
+                <button
+                  className="btn btn-outline"
+                  onClick={handleCancelEdit}
+                  disabled={updatePostMutation.isLoading}
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          ) : (
+            <p className="text-lg text-white">{postDetails.post.content}</p>
+          )}
         </div>
 
         {/* post images */}

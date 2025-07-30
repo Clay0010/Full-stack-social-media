@@ -329,25 +329,33 @@ export const deletePost = async (req, res) => {
       where: { id: postId },
       select: { userId: true },
     });
+
     if (!post) {
       return res.status(404).json({ error: "Post not found" });
     }
+
     if (post.userId !== userId) {
       return res
         .status(403)
         .json({ error: "You are not authorized to delete this post" });
     }
 
+    // Delete images first
+    await prisma.image.deleteMany({
+      where: { postId },
+    });
+
+    // Delete comments
     await prisma.comment.deleteMany({
       where: { postId },
     });
 
+    // Delete likes
     await prisma.like.deleteMany({
-      where: {
-        postId,
-      },
+      where: { postId },
     });
 
+    // Delete the post itself
     await prisma.post.delete({
       where: { id: postId },
     });
@@ -356,27 +364,29 @@ export const deletePost = async (req, res) => {
       .status(200)
       .json({ success: true, message: "Post deleted successfully" });
   } catch (error) {
-    console.log("Error deleting post:", error);
+    console.error("Error deleting post:", error);
     res.status(500).json({ error: "Internal server error" });
   }
 };
 
 export const updatePost = async (req, res) => {
   const postId = parseInt(req.params.id, 10);
-  const { content, imageUrl } = req.body;
+  const { content } = req.body;
   const userId = req.user.userId;
 
   if (!postId || isNaN(postId)) {
     return res.status(400).json({ error: "Post ID is required" });
   }
 
-  if (!content && !imageUrl) {
-    return res.status(400).json({ error: "Content or image URL is required" });
+  if (!content) {
+    console.log("Content is required for updating post");
+
+    return res.status(400).json({ error: "Content  is required" });
   }
 
-  if (imageUrl && !isValidImageUrl(imageUrl)) {
-    return res.status(400).json({ error: "Invalid image URL format" });
-  }
+  // if (imageUrl && !isValidImageUrl(imageUrl)) {
+  //   return res.status(400).json({ error: "Invalid image URL format" });
+  // }
 
   try {
     const post = await prisma.post.findUnique({
@@ -400,13 +410,12 @@ export const updatePost = async (req, res) => {
       where: { id: postId },
       data: {
         ...(content && { content }),
-        ...(imageUrl && { imageUrl }),
+        // ...(imageUrl && { imageUrl }),
       },
     });
 
     res.status(200).json({ success: true, post: updatedPost });
   } catch (error) {
-    console.log("Error updating post:", error);
     res.status(500).json({ error: "Internal server error" });
   }
 };

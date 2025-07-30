@@ -69,6 +69,20 @@ const ProfilePage = () => {
     setEditing(false);
   };
 
+  const handleCopyProfileLink = () => {
+    // Copy current full URL from browser location
+    const profileUrl = window.location.href;
+
+    navigator.clipboard
+      .writeText(profileUrl)
+      .then(() => {
+        toast.success("Profile URL copied to clipboard!");
+      })
+      .catch(() => {
+        toast.error("Failed to copy profile URL.");
+      });
+  };
+
   return (
     <div className="h-screen w-[90%] mx-auto overflow-y-auto hide-scrollbar">
       {/* Header */}
@@ -112,7 +126,10 @@ const ProfilePage = () => {
                 {isFollowing ? "Unfollow" : "Follow"}
               </button>
             )}
-            <button className="btn btn-secondary btn-sm">
+            <button
+              className="btn btn-secondary btn-sm"
+              onClick={handleCopyProfileLink}
+            >
               Copy Profile Link
             </button>
           </div>
@@ -172,7 +189,25 @@ const ProfilePage = () => {
             ))}
           </div>
         ) : (
-          <div>You Have No Posts</div>
+          <div>
+            {isOwner ? (
+              <div className="text-center mt-10">
+                <h2 className="text-lg font-semibold">No Posts Yet</h2>
+                <p className="text-sm opacity-70">
+                  Start sharing your thoughts and experiences!
+                </p>
+              </div>
+            ) : (
+              <div className="text-center mt-10">
+                <h2 className="text-lg font-semibold">
+                  {profile.username} has not posted yet.
+                </h2>
+                <p className="text-sm opacity-70">
+                  Follow them to see their posts when they share!
+                </p>
+              </div>
+            )}
+          </div>
         )}
       </div>
 
