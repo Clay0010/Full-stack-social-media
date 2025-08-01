@@ -12,6 +12,7 @@ import LetterGlitch from "../components/LetterGlitch";
 import TiltedCard from "../components/TiltedCard";
 import formatToLocalTime from "../lib/formatToLocalTime";
 import EditProfileModal from "../components/EditProfileModal";
+import FollowersModal from "../components/FollowersModal";
 
 const ProfilePage = () => {
   const navigate = useNavigate();
@@ -23,6 +24,9 @@ const ProfilePage = () => {
   const { followUserMutation } = useFollowUser();
   const { unfollowUserMutation } = useUnfollowUser(finalUserId);
   const { updateProfileMutation } = useUpdateProfile();
+
+  const [followersOpen, setFollowersOpen] = useState(false);
+  const [followingOpen, setFollowingOpen] = useState(false);
 
   const [editForm, setEditForm] = useState({
     username: "",
@@ -83,6 +87,8 @@ const ProfilePage = () => {
       });
   };
 
+  const handleShowFollowers = () => {};
+
   return (
     <div className="h-screen w-[90%] mx-auto overflow-y-auto hide-scrollbar">
       {/* Header */}
@@ -142,11 +148,23 @@ const ProfilePage = () => {
             </span>
             <span className="flex gap-1 items-center">
               <h1 className="font-bold">{profile.followers?.length || 0}</h1>
-              <p className="text-md">Followers</p>
+              <p
+                className="text-md hover:cursor-pointer"
+                title="followers list"
+                onClick={() => setFollowersOpen(true)}
+              >
+                Followers
+              </p>
             </span>
             <span className="flex gap-1 items-center">
               <h1 className="font-bold">{profile.following?.length || 0}</h1>
-              <p className="text-md">Following</p>
+              <p
+                className="text-md hover:cursor-pointer"
+                title="following list"
+                onClick={() => setFollowingOpen(true)}
+              >
+                Following
+              </p>
             </span>
           </div>
 
@@ -218,6 +236,18 @@ const ProfilePage = () => {
         editForm={editForm}
         setEditForm={setEditForm}
         onSave={handleSaveProfile}
+      />
+      <FollowersModal
+        isOpen={followersOpen}
+        onClose={() => setFollowersOpen(false)}
+        list={profile.followers}
+        title="Followers"
+      />
+      <FollowersModal
+        isOpen={followingOpen}
+        onClose={() => setFollowingOpen(false)}
+        list={profile.following}
+        title="Following"
       />
     </div>
   );

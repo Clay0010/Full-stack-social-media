@@ -1,14 +1,15 @@
 import React, { useState, useRef } from "react";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { axiosInstance } from "../lib/axios";
 import toast from "react-hot-toast";
-
+import Loader from "./Loader";
 const CreatePost = () => {
   const [text, setText] = useState("");
   const [imageUrls, setImageUrls] = useState([]);
   const backendURL = "http://localhost:5000";
 
   const fileInputRef = useRef(null);
+  const queryClient = useQueryClient();
 
   const mutation = useMutation({
     mutationFn: async (postData) => {
@@ -22,6 +23,8 @@ const CreatePost = () => {
       toast.success("Post Created Successfully.");
       setText("");
       setImageUrls([]);
+      queryClient.invalidateQueries({ queryKey: ["posts"] });
+      queryClient.invalidateQueries({ queryKey: ["followingPosts"] });
 
       if (fileInputRef.current) fileInputRef.current.value = null;
     },
@@ -55,7 +58,7 @@ const CreatePost = () => {
 
     const postData = {
       content: text,
-      imageUrls: imageUrls, // Already full URLs
+      imageUrls: imageUrls,
     };
 
     mutation.mutate(postData);
@@ -70,12 +73,13 @@ const CreatePost = () => {
       <h2 className="text-xl font-semibold mb-4">Share a Post</h2>
       <form onSubmit={handleSubmit}>
         <textarea
-          className="textarea textarea-bordered w-full mb-3"
+          className="textarea textarea-bordered w-full mb-3 h-30"
           placeholder="What's on your mind?"
           rows={3}
           value={text}
           onChange={(e) => setText(e.target.value)}
         />
+       
 
         <input
           type="file"

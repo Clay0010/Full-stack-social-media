@@ -20,8 +20,8 @@ router.patch("/me", authenticate, updateUser);
 router.get("/suggestions", authenticate, getSuggestion);
 
 router.get("/:id", authenticate, getUser);
-router.get("/:id/followers", authenticate, getUserFollowers);
-router.get("/:id/following", authenticate, getUserFollowing);
+router.get("/:id/followers", authenticate, getUserFollowers); // not needed in frontend
+router.get("/:id/following", authenticate, getUserFollowing); // not needed in frontend
 router.post("/:id/follow", authenticate, followUser);
 router.post("/:id/unfollow", authenticate, unfollowUser);
 

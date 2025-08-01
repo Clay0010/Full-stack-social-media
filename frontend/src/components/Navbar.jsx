@@ -1,17 +1,33 @@
 import React, { useState } from "react";
-import { Home, BarChart, UserRound } from "lucide-react";
+import { Home, BarChart, UserRound, LogOut } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import useLogout from "../hooks/useLogout";
 import useGetAllUsers from "../hooks/useGetAllUsers";
 import ThemeSelector from "./themeSelector";
+import { useRef, useEffect } from "react";
+import Loader from "./Loader";
 
 const Navbar = () => {
   const navigate = useNavigate();
+  const inputRef = useRef(null);
   const { logoutMutation } = useLogout();
   const { allUsers, isLoading, error } = useGetAllUsers();
 
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState([]);
+
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      // Check if Ctrl + K is pressed
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "k") {
+        e.preventDefault(); // prevent browser search
+        inputRef.current?.focus();
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, []);
 
   const handleSearchUsers = (e) => {
     const query = e.target.value;
@@ -29,7 +45,7 @@ const Navbar = () => {
     setSearchResults(results);
   };
 
-  if (isLoading) return <div>Loading...</div>;
+  if (isLoading) return <Loader />;
   if (error) return <div>Error loading users</div>;
 
   return (
@@ -43,18 +59,26 @@ const Navbar = () => {
       <div className="navbar-center">
         <ul className="menu menu-horizontal bg-base-100 rounded-box">
           <li className="px-2">
-            <a className="tooltip tooltip-bottom" data-tip="Home">
+            <a className="tooltip tooltip-bottom" data-tip="Home" href="/">
               <Home className="h-5 w-5" />
             </a>
           </li>
           <li className="px-2">
-            <a className="tooltip tooltip-bottom" data-tip="User Profile">
+            <a
+              className="tooltip tooltip-bottom"
+              data-tip="User Profile"
+              href="/profile"
+            >
               <UserRound className="h-5 w-5" />
             </a>
           </li>
           <li className="px-2">
-            <a className="tooltip tooltip-bottom" data-tip="Stats">
-              <BarChart className="h-5 w-5" />
+            <a
+              className="tooltip tooltip-bottom"
+              data-tip="Logout"
+              onClick={logoutMutation}
+            >
+              <LogOut className="h-5 w-5" />
             </a>
           </li>
         </ul>
@@ -65,11 +89,12 @@ const Navbar = () => {
         <div className="dropdown dropdown-end">
           <input
             type="text"
-            placeholder="Search People"
+            placeholder="Search People ... (Ctrl + K)"
             className="input input-bordered w-24 md:w-auto"
             value={searchQuery}
             onChange={handleSearchUsers}
             tabIndex={0}
+            ref={inputRef}
           />
           {searchResults.length > 0 && (
             <ul
@@ -121,12 +146,9 @@ const Navbar = () => {
             <li>
               <a className="justify-between" href="/profile">
                 Profile
-                <span className="badge">New</span>
               </a>
             </li>
-            <li>
-              <a>Settings</a>
-            </li>
+
             <li>
               <button onClick={logoutMutation}>Logout</button>
             </li>

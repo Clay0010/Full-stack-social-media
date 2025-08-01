@@ -28,8 +28,6 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage });
 
-// POST route for uploading
-// Change upload.single to upload.array with max count 10
 router.post("/", upload.array("images", 10), (req, res) => {
   if (!req.files || req.files.length === 0)
     return res.status(400).json({ message: "No files uploaded" });
