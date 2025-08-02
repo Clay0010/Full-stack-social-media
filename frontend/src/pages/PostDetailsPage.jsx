@@ -1,13 +1,14 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { useParams } from "react-router-dom";
 import useGetPostDetails from "../hooks/useGetPostDetails";
 import useComment from "../hooks/useComment";
 import toast from "react-hot-toast";
 import useAuthUser from "../hooks/useAuthUser";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { axiosInstance } from "../lib/axios";
+
 import useUpdatePost from "../hooks/useUpdatePost";
 import useDeletePost from "../hooks/useDeletePost";
+import { motion } from "motion/react";
+import formatToLocalTime from "../lib/formatToLocalTime";
 
 const PostDetailsPage = () => {
   const { postId } = useParams();
@@ -92,7 +93,12 @@ const PostDetailsPage = () => {
   };
 
   return (
-    <div className="w-[80%] mx-auto shadow-lg p-30">
+    <motion.div
+      initial={{ opacity: 0, y: 30 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.3, ease: "easeOut" }}
+      className="w-[80%] mx-auto shadow-lg p-30 hide-scrollbar"
+    >
       <div>
         {/* user information */}
         <span className="flex items-center justify-between gap-2 mb-5">
@@ -202,7 +208,7 @@ const PostDetailsPage = () => {
             postDetails.post.comments.map((comment) => (
               <div
                 key={comment?.id}
-                className="bg-base-300 p-5 rounded-lg mb-5"
+                className="bg-base-300 p-3 rounded-lg mb-4 flex justify-between items-center"
               >
                 <span className="flex items-center gap-2 mb-3">
                   <img
@@ -217,6 +223,7 @@ const PostDetailsPage = () => {
                     <p className="text-md text-gray-500">{comment.content}</p>
                   </span>
                 </span>
+                <span className="opacity-75 text-xs">{formatToLocalTime(comment.createdAt)}</span>
               </div>
             ))
           ) : (
@@ -224,7 +231,7 @@ const PostDetailsPage = () => {
           )}
         </section>
       </div>
-    </div>
+    </motion.div>
   );
 };
 

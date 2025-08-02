@@ -66,7 +66,7 @@ const Navbar = () => {
           <li className="px-2">
             <a
               className="tooltip tooltip-bottom"
-              data-tip="User Profile"
+              data-tip="Profile"
               href="/profile"
             >
               <UserRound className="h-5 w-5" />

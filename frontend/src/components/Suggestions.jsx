@@ -3,6 +3,7 @@ import usegetSuggestions from "../hooks/usegetSuggestions";
 import useFollowUser from "../hooks/useFollowUser";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
+import { motion, AnimatePresence } from "framer-motion";
 
 const Suggestions = () => {
   const navigate = useNavigate();
@@ -34,43 +35,52 @@ const Suggestions = () => {
   };
 
   return (
-    <div className="pt-8 px-5 ">
-      <h1 className="mb-3 uppercase font-semibold text-md opacity-75 tracking-wider">
-        Suggestions
-      </h1>
-      <div className="flex flex-col gap-2">
-        {/* this could be a component */}
-        {suggestedUsers.suggestions.map((user) => {
-          return (
-            <div
-              className="flex justify-between px-3 py-3 w-[95%] m-auto rounded-xl bg-base-200"
-              key={user.id}
-            >
-              <span className="flex justify-start items-center gap-3">
-                <img
-                  src={user.profilePicUrl || "https://via.placeholder.com/150"}
-                  alt="image"
-                  className="h-8 w-8 rounded-full hover:cursor-pointer"
-                  onClick={() => navigate(`/profile/${user.id}`)}
-                />
-                <h3
-                  className="text-sm font-semibold hover:cursor-pointer hover:underline"
-                  onClick={() => navigate(`/profile/${user.id}`)}
-                >
-                  {user.username}
-                </h3>
-              </span>
-              <button
-                className="btn btn-primary text-sm btn-sm"
-                onClick={() => handleFollowUser(user.id)}
+    <AnimatePresence>
+      <motion.div
+        initial={{ x: 50, opacity: 0 }} // start slightly off-screen right
+        animate={{ x: 0, opacity: 1 }} // slide in to place
+        transition={{ duration: 0.4, ease: "easeOut", delay: 0.1 }}
+        className="pt-8 px-5 "
+      >
+        <h1 className="mb-3 uppercase font-semibold text-md opacity-75 tracking-wider">
+          Suggestions
+        </h1>
+        <div className="flex flex-col gap-2">
+          {/* this could be a component */}
+          {suggestedUsers.suggestions.map((user) => {
+            return (
+              <div
+                className="flex justify-between px-3 py-3 w-[95%] m-auto rounded-xl bg-base-200"
+                key={user.id}
               >
-                Follow
-              </button>
-            </div>
-          );
-        })}
-      </div>
-    </div>
+                <span className="flex justify-start items-center gap-3">
+                  <img
+                    src={
+                      user.profilePicUrl || "https://via.placeholder.com/150"
+                    }
+                    alt="image"
+                    className="h-8 w-8 rounded-full hover:cursor-pointer"
+                    onClick={() => navigate(`/profile/${user.id}`)}
+                  />
+                  <h3
+                    className="text-sm font-semibold hover:cursor-pointer hover:underline"
+                    onClick={() => navigate(`/profile/${user.id}`)}
+                  >
+                    {user.username}
+                  </h3>
+                </span>
+                <button
+                  className="btn btn-primary text-sm btn-sm"
+                  onClick={() => handleFollowUser(user.id)}
+                >
+                  Follow
+                </button>
+              </div>
+            );
+          })}
+        </div>
+      </motion.div>
+    </AnimatePresence>
   );
 };
 
