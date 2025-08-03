@@ -7,7 +7,7 @@ import { motion, AnimatePresence } from "motion/react";
 const CreatePost = () => {
   const [text, setText] = useState("");
   const [imageUrls, setImageUrls] = useState([]);
-  const backendURL = "http://localhost:5000";
+  const backendURL = import.meta.env.VITE_BACKEND_URL;
 
   const fileInputRef = useRef(null);
   const queryClient = useQueryClient();
@@ -46,7 +46,7 @@ const CreatePost = () => {
       });
 
       // res.data is an array of uploaded files info
-      const uploadedUrls = res.data.map((file) => backendURL + file.path);
+      const uploadedUrls = res.data.map((file) => `${backendURL}${file.path}`);
       setImageUrls((prev) => [...prev, ...uploadedUrls]);
     } catch (error) {
       console.error("Failed to upload images:", error);
