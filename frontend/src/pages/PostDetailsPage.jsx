@@ -9,9 +9,11 @@ import useUpdatePost from "../hooks/useUpdatePost";
 import useDeletePost from "../hooks/useDeletePost";
 import { motion } from "motion/react";
 import formatToLocalTime from "../lib/formatToLocalTime";
+import { useNavigate } from "react-router-dom";
 
 const PostDetailsPage = () => {
   const { postId } = useParams();
+  const navigate = useNavigate();
   const [comment, setComment] = useState("");
   const [isEditing, setIsEditing] = useState(false);
   const [editedContent, setEditedContent] = useState("");
@@ -102,7 +104,10 @@ const PostDetailsPage = () => {
       <div>
         {/* user information */}
         <span className="flex items-center justify-between gap-2 mb-5">
-          <div className="flex items-center gap-3">
+          <div
+            className="flex items-center gap-3 hover:cursor-pointer"
+            onClick={() => navigate(`/profile/${postDetails.post.user.id}`)}
+          >
             <img
               src={postDetails.post.user.profilePicUrl}
               alt="user's image"
@@ -223,7 +228,9 @@ const PostDetailsPage = () => {
                     <p className="text-md text-gray-500">{comment.content}</p>
                   </span>
                 </span>
-                <span className="opacity-75 text-xs">{formatToLocalTime(comment.createdAt)}</span>
+                <span className="opacity-75 text-xs">
+                  {formatToLocalTime(comment.createdAt)}
+                </span>
               </div>
             ))
           ) : (

@@ -1,6 +1,8 @@
-const Loader = () => {
+const Loader = ({ classname }) => {
   return (
-    <span className="loading loading-dots loading-lg m-auto text-center"></span>
+    <div className={`${classname} flex items-center justify-center`}>
+      <span className={`loading loading-dots loading-lg text-lg`}></span>
+    </div>
   );
 };
 

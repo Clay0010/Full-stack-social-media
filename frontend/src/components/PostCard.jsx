@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import formatToLocalTime from "../lib/formatToLocalTime";
 import TruncatedText from "./TruncatedText";
-import { Edit, Heart, MessageCircleMore, Trash, Trash2 } from "lucide-react";
+import { Edit, Heart, MessageCircleMore, Trash2 } from "lucide-react";
 import useLikePost from "../hooks/useLikePost";
 import useComment from "../hooks/useComment";
 import useAuthUser from "../hooks/useAuthUser";
@@ -10,16 +10,17 @@ import { AnimatePresence, motion } from "motion/react";
 import useDeleteComment from "../hooks/useDeleteComment";
 import useUpdateComment from "../hooks/useUpdateComment";
 import { useNavigate } from "react-router-dom";
+import CommentItem from "./CommentItem";
 
 const PostCard = ({ post }) => {
   const [showComment, setShowComment] = useState(false);
   const [comment, setComment] = useState("");
   const [editingComment, setEditingComment] = useState(null);
   const [editingText, setEditingText] = useState("");
+  const [deleteTarget, setDeleteTarget] = useState(null); // holds comment for delete modal
+
   const navigate = useNavigate();
-
   const formattedDate = formatToLocalTime(post.createdAt);
-
   const authUser = useAuthUser();
   const userId = authUser.authUser.userId;
 
@@ -50,11 +51,16 @@ const PostCard = ({ post }) => {
     );
   };
 
-  const handleDeleteComment = (commentId, postId) => {
+  const handleDeleteComment = () => {
+    if (!deleteTarget) return;
     deleteCommentMutation(
-      { commentId, postId },
+      { commentId: deleteTarget.id, postId: post.id },
       {
-        onSuccess: () => toast.success("Comment deleted successfully!"),
+        onSuccess: () => {
+          toast.success("Comment deleted successfully!");
+          setDeleteTarget(null);
+          document.getElementById("deleteModal").close();
+        },
         onError: () => toast.error("Failed to delete comment."),
       }
     );
@@ -92,11 +98,11 @@ const PostCard = ({ post }) => {
   return (
     <AnimatePresence>
       <motion.div
-        initial={{ opacity: 0, y: 50 }} 
-        whileInView={{ opacity: 1, y: 0 }} 
+        initial={{ opacity: 0, y: 50 }}
+        whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true, amount: 0.1 }}
         transition={{ duration: 0.6, ease: "easeOut" }}
-        className="border border-neutral w-full m-4 mb-8 rounded-lg shadow-lg p-5"
+        className="border border-neutral w-full m-4 mb-8 rounded-3xl shadow-lg p-5"
       >
         {/* user info */}
         <section className="flex items-center gap-3">
@@ -198,80 +204,25 @@ const PostCard = ({ post }) => {
               </h1>
               <div>
                 {post.comments.map((comment) => (
-                  <div
+                  <CommentItem
                     key={comment.id}
-                    className="flex items-center justify-between gap-3 py-3 px-2 border-b border-neutral"
-                  >
-                    <div className="flex items-start gap-3">
-                      <img
-                        src={comment.user.profilePicUrl}
-                        alt="user"
-                        className="w-8 h-8 object-cover rounded-full flex-shrink-0 hover:cursor-pointer"
-                        onClick={() => handleShowProfile(comment.user.id)}
-                      />
-                      <div className="max-w-[80%] break-words">
-                        <h1
-                          className="text-xs font-bold hover:cursor-pointer hover:text-primary"
-                          onClick={() => handleShowProfile(comment.user.id)}
-                        >
-                          {comment.user.username}
-                        </h1>
-                        <p className="text-sm">{comment.content}</p>
-                      </div>
-                    </div>
-                    <span className="whitespace-nowrap flex flex-col items-end gap-2">
-                      {userId === comment.user.id && (
-                        <span className="flex items-center gap-2">
-                          <Edit
-                            className="size-4 hover:cursor-pointer hover:text-primary"
-                            onClick={() => handleEditClick(comment)}
-                          />
-                          <Trash
-                            className="size-4 hover:text-red-500 hover:cursor-pointer"
-                            onClick={() =>
-                              document
-                                .getElementById(`modal_${comment.id}`)
-                                .showModal()
-                            }
-                          />
-                          <dialog id={`modal_${comment.id}`} className="modal">
-                            <div className="modal-box flex flex-col items-center">
-                              <Trash2 className="size-8 text-red-500" />
-                              <h1 className="text-lg font-semibold m-2">
-                                Delete
-                              </h1>
-                              <h3 className="text-sm">
-                                Are you sure you want to delete?
-                              </h3>
-                              <span>
-                                <button
-                                  className="btn btn-md mt-4 bg-red-500 text-white"
-                                  onClick={() =>
-                                    handleDeleteComment(comment.id, post.id)
-                                  }
-                                >
-                                  Confirm
-                                </button>
-                              </span>
-                            </div>
-                            <form method="dialog" className="modal-backdrop">
-                              <button>close</button>
-                            </form>
-                          </dialog>
-                        </span>
-                      )}
-                      <p className="text-xs text-gray-500">
-                        {formatToLocalTime(comment.createdAt)}
-                      </p>
-                    </span>
-                  </div>
+                    comment={comment}
+                    userId={userId}
+                    postId={post.id}
+                    onEdit={handleEditClick}
+                    onDelete={() => {
+                      setDeleteTarget(comment);
+                      document.getElementById("deleteModal").showModal();
+                    }}
+                    onShowProfile={handleShowProfile}
+                  />
                 ))}
               </div>
             </motion.div>
           )}
         </AnimatePresence>
 
-        {/* EDIT COMMENT MODAL (State-driven) */}
+        {/* EDIT COMMENT MODAL */}
         {editingComment && (
           <dialog open className="modal">
             <div className="modal-box">
@@ -301,6 +252,26 @@ const PostCard = ({ post }) => {
             </form>
           </dialog>
         )}
+
+        {/* DELETE COMMENT MODAL */}
+        <dialog id="deleteModal" className="modal">
+          <div className="modal-box flex flex-col items-center">
+            <Trash2 className="size-8 text-red-500" />
+            <h1 className="text-lg font-semibold m-2">Delete</h1>
+            <h3 className="text-sm">Are you sure you want to delete?</h3>
+            <span>
+              <button
+                className="btn btn-md mt-4 bg-red-500 text-white"
+                onClick={handleDeleteComment}
+              >
+                Confirm
+              </button>
+            </span>
+          </div>
+          <form method="dialog" className="modal-backdrop">
+            <button onClick={() => setDeleteTarget(null)}>close</button>
+          </form>
+        </dialog>
       </motion.div>
     </AnimatePresence>
   );

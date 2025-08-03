@@ -4,12 +4,13 @@ import useAuthUser from "../hooks/useAuthUser";
 import useInfinitePosts from "../hooks/useInfinitePosts";
 import useInfiniteFollowingPosts from "../hooks/useInfiniteFollowingPosts";
 import PostCard from "../components/PostCard";
+import { useFeedFilterStore } from "../store/useFeedFilterStore";
 
 const HomePage = () => {
-  const [filter, setFilter] = useState("all");
+  const { filter, setFilter } = useFeedFilterStore();
+
   const user = useAuthUser();
   const userId = user?.authUser?.userId;
-  // console.log(userId);
 
   if (filter === "following" && !userId) {
     return <p>Loading user info...</p>;

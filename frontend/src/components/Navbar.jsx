@@ -6,12 +6,15 @@ import useGetAllUsers from "../hooks/useGetAllUsers";
 import ThemeSelector from "./themeSelector";
 import { useRef, useEffect } from "react";
 import Loader from "./Loader";
+import useAuthUser from "../hooks/useAuthUser";
 
 const Navbar = () => {
   const navigate = useNavigate();
   const inputRef = useRef(null);
   const { logoutMutation } = useLogout();
   const { allUsers, isLoading, error } = useGetAllUsers();
+  const user = useAuthUser();
+  const userId = user?.authUser?.userId;
 
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState([]);
@@ -67,7 +70,7 @@ const Navbar = () => {
             <a
               className="tooltip tooltip-bottom"
               data-tip="Profile"
-              href="/profile"
+              href={`/profile/${userId}`}
             >
               <UserRound className="h-5 w-5" />
             </a>
@@ -144,7 +147,7 @@ const Navbar = () => {
             className="menu menu-sm dropdown-content bg-base-200 rounded-box mt-3 w-52 p-2 shadow"
           >
             <li>
-              <a className="justify-between" href="/profile">
+              <a className="justify-between" href={`/profile/${userId}`}>
                 Profile
               </a>
             </li>
