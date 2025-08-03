@@ -3,7 +3,7 @@ import { Home, BarChart, UserRound, LogOut } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import useLogout from "../hooks/useLogout";
 import useGetAllUsers from "../hooks/useGetAllUsers";
-import ThemeSelector from "./themeSelector";
+import ThemeSelector from "./ThemeSelector";
 import { useRef, useEffect } from "react";
 import Loader from "./Loader";
 import useAuthUser from "../hooks/useAuthUser";
