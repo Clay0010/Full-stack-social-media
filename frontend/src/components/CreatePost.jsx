@@ -7,7 +7,7 @@ import { motion, AnimatePresence } from "motion/react";
 const CreatePost = () => {
   const [text, setText] = useState("");
   const [imageUrls, setImageUrls] = useState([]);
-  const backendURL = import.meta.env.VITE_BACKEND_URL;
+  const backendURL = import.meta.env.VITE_API_URL;
 
   const fileInputRef = useRef(null);
   const queryClient = useQueryClient();
