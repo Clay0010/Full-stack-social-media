@@ -35,7 +35,7 @@ router.post("/", upload.array("images", 10), (req, res) => {
   // Map over files to get filename and path
   const filesInfo = req.files.map((file) => ({
     filename: file.filename,
-    path: `/uploads/${file.filename}`,
+    path: `/api/uploads/${file.filename}`,
   }));
 
   res.status(200).json(filesInfo);

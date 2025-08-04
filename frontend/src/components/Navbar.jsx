@@ -7,6 +7,7 @@ import ThemeSelector from "./ThemeSelector";
 import { useRef, useEffect } from "react";
 import Loader from "./Loader";
 import useAuthUser from "../hooks/useAuthUser";
+import useGetUser from "../hooks/useGetUser";
 
 const Navbar = () => {
   const navigate = useNavigate();
@@ -16,12 +17,13 @@ const Navbar = () => {
   const user = useAuthUser();
   const userId = user?.authUser?.userId;
 
+  const currentUser = allUsers.find((u) => u.id === userId);
+
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState([]);
 
   useEffect(() => {
     const handleKeyDown = (e) => {
-      // Check if Ctrl + K is pressed
       if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "k") {
         e.preventDefault(); // prevent browser search
         inputRef.current?.focus();
@@ -138,7 +140,7 @@ const Navbar = () => {
             <div className="w-10 rounded-full">
               <img
                 alt="Tailwind CSS Navbar component"
-                src="https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp"
+                src={currentUser.profilePicUrl}
               />
             </div>
           </div>
