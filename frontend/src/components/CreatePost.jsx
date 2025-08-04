@@ -7,7 +7,7 @@ import { motion, AnimatePresence } from "motion/react";
 const CreatePost = () => {
   const [text, setText] = useState("");
   const [imageUrls, setImageUrls] = useState([]);
-  const backendURL = import.meta.env.VITE_API_URL;
+  const backendURL = import.meta.env.VITE_IMAGES_UPLOAD_URL;
 
   const fileInputRef = useRef(null);
   const queryClient = useQueryClient();
@@ -45,8 +45,12 @@ const CreatePost = () => {
         headers: { "Content-Type": "multipart/form-data" },
       });
 
+      console.log("uploaded urls res: ", res.data);
+
       // res.data is an array of uploaded files info
       const uploadedUrls = res.data.map((file) => `${backendURL}${file.path}`);
+      console.log("uploadedurls", uploadedUrls);
+
       setImageUrls((prev) => [...prev, ...uploadedUrls]);
     } catch (error) {
       console.error("Failed to upload images:", error);
